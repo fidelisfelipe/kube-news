@@ -71,7 +71,7 @@ spec:
             - 
               name: DB_HOST
               value: postgres
-          image: fidelisfelipe/kube-news:v1 #TODO: corrigir em fidelisfelipe a imagem e substituir a usada atualmente
+          image: fidelisfelipe/kube-news:{{TAG}}
           name: web
           ports: 
             - 
