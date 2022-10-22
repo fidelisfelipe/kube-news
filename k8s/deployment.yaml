@@ -1,91 +1,81 @@
+# Deployment do Postgre
 apiVersion: apps/v1
 kind: Deployment
-metadata: 
-  name: postgres
-spec: 
-  selector: 
-    matchLabels: 
-      app: postgres
-  template: 
-    metadata: 
-      labels: 
-        app: postgres
-    spec: 
-      containers: 
-        - 
-          env: 
-            - 
-              name: POSTGRES_DB
-              value: kubenews
-            - 
-              name: POSTGRES_USER
-              value: postgres
-            - 
-              name: POSTGRES_PASSWORD
-              value: postgres
-          image: "postgres:15.0"
-          name: postgres
-          ports: 
-            - 
-              containerPort: 5432
+metadata:
+  name: postgre
+spec:
+  selector:
+    matchLabels:
+      app: postgre
+  template:
+    metadata:
+      labels:
+        app: postgre
+    spec:
+      containers:
+      - name: postgre
+        image: postgres:14.3
+        ports:
+        - containerPort: 5432
+        env:
+          - name: POSTGRES_PASSWORD
+            value: "kube#123"
+          - name: POSTGRES_USER
+            value: "kubenews"
+          - name: POSTGRES_DB
+            value: "kubenews"
+
 ---
+
 apiVersion: v1
 kind: Service
-metadata: 
-  name: postgres
-spec: 
-  ports: 
-    - 
-      port: 5432
-      targetPort: 5432
-  selector: 
-    app: postgres
-  type: ClusterIP
+metadata:
+  name: postgre
+spec:
+  selector:
+    app: postgre
+  ports:
+  - port: 5432
+    targetPort: 5432
+
 ---
+
 apiVersion: apps/v1
 kind: Deployment
-metadata: 
-  name: web
-spec: 
-  replicas: 1
-  selector: 
-    matchLabels: 
-      app: web
-  template: 
-    metadata: 
-      labels: 
-        app: web
-    spec: 
-      containers: 
-        - 
-          env: 
-            - 
-              name: DB_DATABASE
-              value: kubenews
-            - 
-              name: DB_USERNAME
-              value: postgres
-            - 
-              name: DB_PASSWORD
-              value: postgres
-            - 
-              name: DB_HOST
-              value: postgres
-          image: fidelisfelipe/kube-news:{{TAG}}
-          name: web
-          ports: 
-            - 
-              containerPort: 8080
+metadata:
+  name: kubenews
+spec:
+  selector:
+    matchLabels:
+      app: kubenews
+  template:
+    metadata:
+      labels:
+        app: kubenews
+    spec:
+      containers:
+      - name: kubenews
+        image: dropecosta/kube-news:v1
+        env:
+          - name: DB_DATABASE
+            value: "kubenews"
+          - name: DB_USERNAME
+            value: "kubenews"
+          - name: DB_PASSWORD
+            value: "kube#123"
+          - name: DB_HOST
+            value: "postgre"
+
 ---
+
 apiVersion: v1
 kind: Service
-metadata: 
-  name: web
-spec: 
-  ports: 
-    - 
-      port: 80
-      targetPort: 8080
-  selector: 
-    app: web
+metadata:
+  name: kube-news
+spec:
+  selector:
+    app: kubenews
+  ports:
+  - port: 80
+    targetPort: 8080
   type: LoadBalancer
