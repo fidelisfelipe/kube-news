@@ -55,7 +55,7 @@ spec:
     spec:
       containers:
       - name: kubenews
-        image: fidelisfelipe/kube-news:v2
+        image: fidelisfelipe/kube-news:{{TAG}}
         env:
           - name: DB_DATABASE
             value: "kubenews"
