@@ -22,7 +22,7 @@
 		stage ('Deploy Docker Image'){
 			steps {
 				script {
-						docker.withKubeconfig(crdentialsId: 'kubeconfig'){
+						docker.withKubeConfig(credentialsId: 'kubeconfig'){
 							sh 'kubectl apply -f ./k8s/deployment.yaml'
 						}
 					}
