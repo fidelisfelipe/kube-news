@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: postgres
+spec: 
+  selector: 
+    matchLabels: 
+      app: postgres
+  template: 
+    metadata: 
+      labels: 
+        app: postgres
+    spec: 
+      containers: 
+        - 
+          env: 
+            - 
+              name: POSTGRES_DB
+              value: kubenews
+            - 
+              name: POSTGRES_USER
+              value: postgres
+            - 
+              name: POSTGRES_PASSWORD
+              value: postgres
+          image: "postgres:15.0"
+          name: postgres
+          ports: 
+            - 
+              containerPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: postgres
+spec: 
+  ports: 
+    - 
+      port: 5432
+      targetPort: 5432
+  selector: 
+    app: postgres
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: web
+spec: 
+  replicas: 1
+  selector: 
+    matchLabels: 
+      app: web
+  template: 
+    metadata: 
+      labels: 
+        app: web
+    spec: 
+      containers: 
+        - 
+          env: 
+            - 
+              name: DB_DATABASE
+              value: kubenews
+            - 
+              name: DB_USERNAME
+              value: postgres
+            - 
+              name: DB_PASSWORD
+              value: postgres
+            - 
+              name: DB_HOST
+              value: postgres
+          image: fidelisfelipe/kube-news:v1 #TODO: corrigir em fidelisfelipe a imagem e substituir a usada atualmente
+          name: web
+          ports: 
+            - 
+              containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: web
+spec: 
+  ports: 
+    - 
+      port: 80
+      targetPort: 8080
+  selector: 
+    app: web
+  type: LoadBalancer
